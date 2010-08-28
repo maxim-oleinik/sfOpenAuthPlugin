@@ -1,0 +1,40 @@
+
+# User
+sfOpenAuthUser:
+  actAs:
+    Timestampable:
+      updated:
+        disabled: true
+  columns:
+    id:            { type: integer(4),  primary: true, autoincrement: true }
+    identity:      { type: string(255), notnull: false }
+    name:          { type: string(255) }
+    email:         { type: string(255) }
+    last_login:    { type: timestamp }
+  indexes:
+    identity_idx:
+      fields: [identity]
+      type: unique
+
+
+# Remember
+sfOpenAuthRememberKey:
+  actAs:
+    Timestampable:
+      updated:
+        disabled: true
+  columns:
+    id:             { type: integer(4), primary: true, autoincrement: true }
+    ip_address:     { type: string(50), primary: true }
+    user_id:        { type: integer(4), notnull: true }
+    remember_key:   { type: string(32), notnull: true }
+  relations:
+    User:
+      class: sfOpenAuthUser
+      local: user_id
+      foreignType: one
+      autoComplete: false
+  options:
+    symfony:
+      form:   false
+      filter: false

@@ -1,0 +1,143 @@
+sfOpenAuthPlugin (doctrine 1.2)
+====================================
+
+TODO: Описание
+
+
+Установка
+---------
+
+ 1. Установить плагин
+
+    * Установка из Git-репозитария:
+
+        cd /my/project/dir
+        git clone git://github.com/maxim-oleinik/sfOpenAuthPlugin.git plugins/sfOpenAuthPlugin
+
+    * Подключить как субмодуль для Git-репозитария:
+
+        cd /my/project/dir
+        git submodule add git://github.com/maxim-oleinik/sfOpenAuthPlugin.git plugins/sfOpenAuthPlugin
+
+ 2. Установить Zend
+
+    * Положить в lib/vendor/Zend
+        Controller
+        Http
+        Loader
+        OpenId
+        Session
+        Uri
+        Validate
+        ---
+        Registry.php
+        Exception.php
+
+    * Настроить автозагрузку в ProjectConfiguration.class.php
+
+        set_include_path(implode(PATH_SEPARATOR, array(
+            dirname(__FILE__) . '/../lib/vendor',
+            get_include_path(),
+        )));
+        require_once("Zend/Loader/Autoloader.php");
+        Zend_Loader_Autoloader::getInstance();
+
+    * Пропатчить v2 для гугла, см
+        - http://framework.zend.com/issues/browse/ZF-6905
+        - http://zend-framework.ru/google-zend_openid/
+        TODO: положить патч
+
+ 3. Активировать плагин в config/ProjectConfiguration.class.php
+
+        class ProjectConfiguration extends sfProjectConfiguration
+        {
+            public function setup()
+            {
+                $this->enablePlugins(array(
+                    'sfDoctrinePlugin',
+                    'sfOpenAuthPlugin',
+                    '...'
+                ));
+            }
+        }
+
+ 4. Пересобрать модели
+
+        symfony doctrine:build --all-classes
+
+ 5. Обновить БД
+
+        TODO: Миграции
+
+ 6. Опубликовать assets
+
+        ./symfony plugin:publish-assets
+
+ 7. Очистить кеш
+
+        symfony cc
+
+
+Настроить приложение
+--------------------
+
+ 1. Подключить jQuery во view.yml
+
+ 2. Активировать модуль авторизации в `settings.yml`
+
+        all:
+          .settings:
+            enabled_modules:      [default, sfOpenAuth]
+
+ 3. Подключить фильтр "Remember Me" в "filters.yml" перед "security" фильтром
+
+        remember_me:
+          class: sfOpenAuthRememberMeFilter
+        security: ~
+
+ 4. Указать модуль авторизации в `settings.yml`
+
+        login_module:           sfOpenAuth
+        login_action:           login
+
+ 5. Change the parent class in `myUser.class.php`
+
+        class myUser extends sfOpenAuthSecurityUser
+        {
+        }
+
+ 6. Optionally add the following routing rules to `routing.yml`
+
+        open_auth_login:
+          url:   /login
+          param: { module: sfOpenAuth, action: login }
+
+        open_auth_logout:
+          url:   /logout
+          param: { module: sfOpenAuth, action: logout }
+
+        open_auth_verify:
+          url:   /auth/openid/verify
+          param: { module: sfOpenAuth, action: verify }
+
+    You can customize the `url` parameter of each route.
+    N.B.: You must have a `@homepage` routing rule (used when a user sign out)
+
+    These routes are automatically registered by the plugin if the module `sfOpenAuth`
+    is enabled unless you defined `app_open_auth_routes_register` to false
+    in the `app.yml` configuration file:
+
+ 7. Secure some modules or your entire application in `security.yml`
+
+        default:
+          is_secure: true
+
+ 8. Дополнительные настройки в app.yml
+
+    all:
+      open_auth:
+        remember_cookie:  me       # remember cookie name
+        remember_ttl:     1296000  # sec, 15 days
+        redirect_signin:  homepage
+        redirect_signout: homepage
+        routes_register:  true

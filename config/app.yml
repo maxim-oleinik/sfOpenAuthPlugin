@@ -1,0 +1,10 @@
+
+all:
+  open_auth:
+    connection:       doctrine
+    user_class:       ~
+    remember_cookie:  me
+    remember_ttl:     1296000 # sec, 15 days
+    redirect_signin:  homepage
+    redirect_signout: homepage
+    routes_register:  true
