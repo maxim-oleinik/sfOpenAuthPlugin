@@ -17,7 +17,7 @@ class sfOpenAuthRememberMeFilter extends sfFilter
         if ($this->isFirstCall() && !$this->context->getUser()->isAuthenticated()
             && $cookie = $this->context->getRequest()->getCookie($cookieName)) {
 
-            $rk = Doctrine::getTable('sfOpenAuthRememberKey')->findOneBy('rememberKey', $cookie);
+            $rk = Doctrine::getTable('sfOpenAuthRememberKey')->findOneBy('remember_key', $cookie);
 
             if ($rk) {
                 $this->context->getUser()->signIn($rk->getUser());
